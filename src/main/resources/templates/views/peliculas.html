@@ -51,7 +51,7 @@
 
                     <div class="mb-3">
                         <label for="actorIds" class="form-label">Actores:</label>
-                        <select name="actorIds" class="form-select" required>
+                        <select name="actorIds" class="form-select" multiple size="5">
                             <option th:each="actor : ${actores}" th:value="${actor.id}" th:text="${actor.nombre}"
                                 th:selected="${pelicula.protagonistas != null && #lists.contains(pelicula.protagonistas, actor)}">
                             </option>
