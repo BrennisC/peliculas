@@ -1,0 +1,193 @@
+/* Estilos para la visualización de actores en películas */
+
+.actor-chip {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  padding: 4px 8px;
+  margin: 2px;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  max-width: 120px;
+}
+
+.actor-chip:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actor-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 6px;
+  border: 1px solid #dee2e6;
+  object-fit: cover;
+}
+
+.actor-avatar-large {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 1px solid #dee2e6;
+  object-fit: cover;
+}
+
+.actor-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: #495057;
+}
+
+.actors-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.actors-container::-webkit-scrollbar {
+  width: 3px;
+}
+
+.actors-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.actors-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.actors-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Estilos para el selector de actores en el formulario */
+.actor-selector {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  background-color: #ffffff;
+}
+
+.actor-checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.actor-checkbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.actor-checkbox-item input[type="checkbox"]:checked + .actor-info {
+  background-color: #e7f3ff;
+}
+
+.actor-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.actor-form-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  border: 2px solid #dee2e6;
+  object-fit: cover;
+}
+
+/* Estilos para las tablas de películas */
+.table-peliculas {
+  font-size: 0.9rem;
+}
+
+.table-peliculas th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table-peliculas td {
+  vertical-align: middle;
+}
+
+.pelicula-titulo {
+  font-weight: 600;
+  color: #212529;
+}
+
+.genero-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.no-actores {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .actor-chip {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    max-width: 100px;
+  }
+
+  .actor-avatar,
+  .actor-avatar-large {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+
+  .actors-container {
+    max-height: 60px;
+  }
+
+  .table-peliculas {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-peliculas tbody tr {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.actor-chip {
+  animation: fadeIn 0.2s ease-out;
+}

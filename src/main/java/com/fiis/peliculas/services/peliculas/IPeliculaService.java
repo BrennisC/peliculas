@@ -2,6 +2,9 @@ package com.fiis.peliculas.services.peliculas;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.fiis.peliculas.entities.Pelicula;
 
 public interface IPeliculaService {
@@ -10,5 +13,6 @@ public interface IPeliculaService {
     Pelicula findById(Long id);
     void  delete(Long id);
     List<Pelicula> findAll();
+    Page<Pelicula> findAll(Pageable pageable);
     
 }

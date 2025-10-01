@@ -63,4 +63,17 @@ public class ActorController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/actores/pageable")
+    public ResponseEntity<List<Actor>> getAllPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+            org.springframework.data.domain.Page<Actor> actoresPage = actorService.findAll(pageable);
+            return ResponseEntity.ok(actoresPage.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

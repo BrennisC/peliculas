@@ -6,6 +6,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -49,15 +53,16 @@ public class PeliculaController {
         return generoService.findAll();
     }
     
-    @ModelAttribute("actores")
-    public List<Actor> populateActores() {
+    // Método para obtener todos los actores para el formulario (sin paginación)
+    @ModelAttribute("todosLosActores")
+    public List<Actor> populateTodosLosActores() {
         return actorService.findAll();
     }
 
     // Mostrar la vista de películas con la lista y formulario
     @GetMapping("/peliculas")
-    public String showPeliculas(Model model) {
-        model.addAttribute("peliculas", peliculaService.findAll());
+    public String showPeliculas(Model model){
+
         model.addAttribute("pelicula", new Pelicula());
         return "views/peliculas";
     }
@@ -101,9 +106,26 @@ public class PeliculaController {
 
 
     @GetMapping("/administrar_peliculas")
-    public String administrarPeliculas(Model model) {
-        model.addAttribute("peliculas", peliculaService.findAll());
+    public String administrarPeliculas(Model model,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "10") int size) {
+        
+        // Paginación para películas en la administración
+        Pageable pageable = PageRequest.of(page, size, Sort.by("nombre"));
+        Page<Pelicula> peliculasPage = peliculaService.findAll(pageable);
+        
+        model.addAttribute("peliculasPage", peliculasPage);
+        model.addAttribute("peliculas", peliculasPage.getContent());
         model.addAttribute("pelicula", new Pelicula());
+        
+        // Atributos para la paginación
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalPages", peliculasPage.getTotalPages());
+        model.addAttribute("totalElements", peliculasPage.getTotalElements());
+        model.addAttribute("hasPrevious", peliculasPage.hasPrevious());
+        model.addAttribute("hasNext", peliculasPage.hasNext());
+        
         return "views/adminitrar_peliculas";
     }
 }

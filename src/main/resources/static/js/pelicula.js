@@ -7,8 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 async function fetchActores() {
     try {
-        const response = await fetch('/api/actores');
+        const response = await fetch('/api/actores/pageable?size=1');
         if (!response.ok) throw new Error('Error al obtener actores');
+
+        console.log('Response:', response); // Depuración: Ver la respuesta completa
         return await response.json();
     } catch (error) {
         console.error('Error fetching actores:', error);

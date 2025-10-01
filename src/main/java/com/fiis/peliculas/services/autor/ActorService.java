@@ -3,6 +3,8 @@ package com.fiis.peliculas.services.autor;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,5 +63,9 @@ public class ActorService  implements  IActorService {
         return (List<Actor>) actorRepository.findAll();
     }
 
+    @Override
+    public Page<Actor> findAll(Pageable pageable) {
+        return actorRepository.findAll(pageable);
+    }
 
 }

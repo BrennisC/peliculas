@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layout/header.html}"></head>
+<link rel="stylesheet" th:href="@{/css/peliculas.css}">
 
 <body>
 
@@ -51,13 +52,21 @@
 
                     <div class="mb-3">
                         <label for="actorIds" class="form-label">Actores:</label>
-                        <select name="actorIds" class="form-select" multiple size="5">
-                            <option th:each="actor : ${actores}" th:value="${actor.id}" th:text="${actor.nombre}"
-                                th:selected="${pelicula.protagonistas != null && #lists.contains(pelicula.protagonistas, actor)}">
-                            </option>
-                        </select>
-                        <small class="form-text text-muted">Mantén presionado Ctrl (Cmd en Mac) para seleccionar
-                            múltiples actores</small>
+                        <div class="actor-selector">
+                            <div th:each="actor : ${todosLosActores}" class="actor-checkbox-item">
+                                <input class="form-check-input me-2" type="checkbox" name="actorIds"
+                                    th:value="${actor.id}" th:id="'actor' + ${actor.id}"
+                                    th:checked="${pelicula.protagonistas != null && #lists.contains(pelicula.protagonistas, actor)}">
+                                <div class="actor-info">
+                                    <img th:src="@{${actor.urlImagen}}" th:alt="${actor.nombre}"
+                                        class="actor-form-avatar" onerror="handleImageError(this)" />
+                                    <label class="form-check-label flex-grow-1" th:for="'actor' + ${actor.id}"
+                                        th:text="${actor.nombre}"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Selecciona todos los actores que participan en la
+                            película</small>
                     </div>
 
                     <div class="d-grid">
@@ -77,9 +86,11 @@
 
     <div class="container my-4">
         <a href="/" class="btn btn-secondary">Volver al inicio</a>
+        <a href="/administrar_peliculas" class="btn btn-info ms-2">Ver Lista Completa</a>
     </div>
 
     <div th:insert="~{layout/footer.html}"></div>
+    <script th:src="@{/js/actor-selector.js}"></script>
 </body>
 
 </html>

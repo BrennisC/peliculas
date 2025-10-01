@@ -3,6 +3,8 @@ package com.fiis.peliculas.services.peliculas;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fiis.peliculas.dao.IPeliculaRepository;
@@ -60,5 +62,10 @@ public class PeliculaService implements IPeliculaService {
     @Override
     public List<Pelicula> findAll() {
         return (List<Pelicula>) peliculaRepository.findAll();
+    }
+
+    @Override
+    public Page<Pelicula> findAll(Pageable pageable) {
+        return peliculaRepository.findAll(pageable);
     }
 }
