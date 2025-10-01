@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layout/header.html}"></head>
+
+<body>
+
+    <!-- Lista de películas -->
+
+    <div class="container my-4">
+        <h3>Lista de Películas</h3>
+        <div th:if="${#lists.isEmpty(peliculas)}" class="alert alert-info">
+            No hay películas registradas.
+        </div>
+
+        <div class="row" th:if="${!#lists.isEmpty(peliculas)}">
+            <div class="col-12">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Fecha de Estreno</th>
+                            <th>Género</th>
+                            <th>Actores</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="pelicula : ${peliculas}">
+                            <td th:text="${pelicula.id}"></td>
+                            <td th:text="${pelicula.nombre}"></td>
+                            <td th:text="${#dates.format(pelicula.fechaEstreno, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${pelicula.genero != null ? pelicula.genero.nombre : 'Sin género'}"></td>
+                            <td>
+                                <span
+                                    th:if="${pelicula.protagonistas != null && !#lists.isEmpty(pelicula.protagonistas)}">
+                                    <span th:each="actor, iterStat : ${pelicula.protagonistas}">
+                                        <span th:text="${actor.nombre}"></span>
+                                        <span th:if="${!iterStat.last}">, </span>
+                                    </span>
+                                </span>
+                                <span
+                                    th:if="${pelicula.protagonistas == null || #lists.isEmpty(pelicula.protagonistas)}">
+                                    Sin actores
+                                </span>
+                            </td>
+                            <td>
+                                <a th:href="@{/peliculas/edit/{id}(id=${pelicula.id})}"
+                                    class="btn btn-warning btn-sm me-1">
+                                    Editar
+                                </a>
+                                <a th:href="@{/peliculas/delete/{id}(id=${pelicula.id})}" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('¿Está seguro de que desea eliminar esta película?')">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
