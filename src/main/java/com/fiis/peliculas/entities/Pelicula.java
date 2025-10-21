@@ -29,7 +29,7 @@ public class Pelicula  implements  Serializable{
     private Long id;
     @NotEmpty(message = "El nombre no puede estar vacio")
     private String nombre;
-    @Column(name="fecha_estreno")
+    @Column(name="fecha_estreno", nullable = false)
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "La fecha de estreno no puede estar vacia")
