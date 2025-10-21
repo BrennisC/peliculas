@@ -8,18 +8,6 @@
 
     <h1 class="text-center">Gestión de Películas</h1>
 
-    <!-- Mostrar mensajes de éxito o error -->
-    <div class="container my-3">
-        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-
     <!-- Formulario para crear/editar película -->
     <div class="container my-4">
         <div class="row justify-content-center">
@@ -29,56 +17,65 @@
 
                     <input type="hidden" th:field="*{id}">
 
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Título:</label>
-                        <input type="text" th:field="*{nombre}" class="form-control" required
-                            placeholder="Nombre de la película">
+
+                    <label for="nombre" class="form-label">Título:</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Nombre de la película"
+                        th:classappend="${#fields.hasErrors('nombre')}? ' is-invalid' : ''" />
+
+                    <!-- Mostrar el error específico del campo nombre justo debajo -->
+                    <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback d-block" th:errors="*{nombre}">
                     </div>
 
                     <div class="mb-3">
                         <label for="fechaEstreno" class="form-label">Fecha de Estreno:</label>
-                        <input type="date" th:field="*{fechaEstreno}" class="form-control" required>
+                        <input type="date" th:field="*{fechaEstreno}" class="form-control"
+                            th:classappend="${#fields.hasErrors('fechaEstreno')}? ' is-invalid' : ''" />
+                        <div th:if="${#fields.hasErrors('fechaEstreno')}" class="invalid-feedback d-block"
+                            th:errors="*{fechaEstreno}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="generoId" class="form-label">Género:</label>
-                        <select name="generoId" class="form-select" required>
+                        <select name="generoId" class="form-select" th:field="*{genero.id}"
+                            th:classappend="${#fields.hasErrors('genero')}? ' is-invalid' : ''">
                             <option value="">Seleccione un género</option>
                             <option th:each="genero : ${generos}" th:value="${genero.id}" th:text="${genero.nombre}"
                                 th:selected="${pelicula.genero != null && pelicula.genero.id == genero.id}">
                             </option>
                         </select>
-                    </div>
+                        <span th:if="${#fields.hasErrors('genero')}" class="invalid-feedback">
+                        </span>
 
-                    <div class="mb-3">
-                        <label for="actorIds" class="form-label">Actores:</label>
-                        <div class="actor-selector">
-                            <div th:each="actor : ${todosLosActores}" class="actor-checkbox-item">
-                                <input class="form-check-input me-2" type="checkbox" name="actorIds"
-                                    th:value="${actor.id}" th:id="'actor' + ${actor.id}"
-                                    th:checked="${pelicula.protagonistas != null && #lists.contains(pelicula.protagonistas, actor)}">
-                                <div class="actor-info">
-                                    <img th:src="@{${actor.urlImagen}}" th:alt="${actor.nombre}"
-                                        class="actor-form-avatar" onerror="handleImageError(this)" />
-                                    <label class="form-check-label flex-grow-1" th:for="'actor' + ${actor.id}"
-                                        th:text="${actor.nombre}"></label>
+                        <div class="mb-3">
+                            <label for="actorIds" class="form-label">Actores:</label>
+                            <div class="actor-selector">
+                                <div th:each="actor : ${todosLosActores}" class="actor-checkbox-item">
+                                    <input class="form-check-input me-2" type="checkbox" name="actorIds"
+                                        th:value="${actor.id}" th:id="'actor' + ${actor.id}"
+                                        th:checked="${pelicula.protagonistas != null && #lists.contains(pelicula.protagonistas, actor)}">
+                                    <div class="actor-info">
+                                        <img th:src="@{${actor.urlImagen}}" th:alt="${actor.nombre}"
+                                            class="actor-form-avatar" onerror="handleImageError(this)" />
+                                        <label class="form-check-label flex-grow-1" th:for="'actor' + ${actor.id}"
+                                            th:text="${actor.nombre}"></label>
+                                    </div>
                                 </div>
                             </div>
+                            <small class="form-text text-muted">Selecciona todos los actores que participan en
+                                la
+                                película</small>
                         </div>
-                        <small class="form-text text-muted">Selecciona todos los actores que participan en la
-                            película</small>
-                    </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            <span th:if="${pelicula.id == null}">Guardar Película</span>
-                            <span th:if="${pelicula.id != null}">Actualizar Película</span>
-                        </button>
-                    </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <span th:if="${pelicula.id == null}">Guardar Película</span>
+                                <span th:if="${pelicula.id != null}">Actualizar Película</span>
+                            </button>
+                        </div>
 
-                    <div class="d-grid mt-2" th:if="${pelicula.id != null}">
-                        <a th:href="@{/peliculas}" class="btn btn-secondary">Cancelar Edición</a>
-                    </div>
+                        <div class="d-grid mt-2" th:if="${pelicula.id != null}">
+                            <a th:href="@{/peliculas}" class="btn btn-secondary">Cancelar Edición</a>
+                        </div>
                 </form>
             </div>
         </div>
