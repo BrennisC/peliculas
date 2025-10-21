@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -69,15 +70,30 @@ public class PeliculaController {
 
     // Guardar nueva película
     @PostMapping("/peliculas/save")
-    public String savePelicula(@ModelAttribute("pelicula") Pelicula pelicula, 
+    public String savePelicula(@ModelAttribute("pelicula") @jakarta.validation.Valid Pelicula pelicula,
+                              BindingResult result,
                               @RequestParam(value = "generoId", required = false) Long generoId,
                               @RequestParam(value = "actorIds", required = false) List<Long> actorIds,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes , Model model) {
+
+        // Si hay errores de validación, devolver la vista con los errores por campo
+        if (result.hasErrors()) {
+            // Asegurar que la vista tenga los datos necesarios
+            model.addAttribute("pelicula", pelicula);
+            model.addAttribute("generos", generoService.findAll());
+            model.addAttribute("todosLosActores", actorService.findAll());
+
+            // Mensaje genérico de error para la vista (no exponer detalles internos)
+            model.addAttribute("error", "Por favor corrija los errores en el formulario.");
+            return "views/peliculas";
+        }
+
         try {
             peliculaService.save(pelicula, generoId, actorIds);
             redirectAttributes.addFlashAttribute("success", "Película guardada exitosamente");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al guardar la película: " + e.getMessage());
+            // No exponer e.getMessage() que puede contener rutas/entidades.
+            redirectAttributes.addFlashAttribute("error", "Error al guardar la película. Revise los datos y vuelva a intentar.");
         }
         return "redirect:/peliculas";
     }
@@ -89,7 +105,7 @@ public class PeliculaController {
         model.addAttribute("pelicula", pelicula);
         model.addAttribute("peliculas", peliculaService.findAll());
         // Los generos y actores ya están disponibles por los @ModelAttribute
-        return "views/peliculas";
+        return "views/adminitrar_peliculas";
     }
 
     // Eliminar película
@@ -101,7 +117,7 @@ public class PeliculaController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al eliminar la película: " + e.getMessage());
         }
-        return "redirect:/peliculas";
+        return "redirect:/administrar_peliculas";
     }
 
 
