@@ -10,6 +10,16 @@
 
     <div class="container my-4">
         <h3>Lista de Películas</h3>
+        <div class="container my-3">
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
 
         <div th:if="${#lists.isEmpty(peliculas)}" class="alert alert-info">
             No hay películas registradas.
@@ -41,7 +51,12 @@
                     <tbody>
                         <tr th:each="pelicula : ${peliculas}">
                             <td th:text="${pelicula.id}"></td>
-                            <td th:text="${pelicula.nombre}" class="pelicula-titulo"></td>
+                            <td class="pelicula-titulo">
+                                <img src="https://img.freepik.com/foto-gratis/surtido-elementos-cine-sobre-fondo-rojo-espacio-copia_23-2148457848.jpg?semt=ais_hybrid&w=740&q=80"
+                                    alt="Imagen película" class="pelicula-imagen"
+                                    style="width: 50px; height: 75px; object-fit: cover;" />
+                                <span th:text="${pelicula.nombre}"></span>
+                            </td>
                             <td th:text="${#dates.format(pelicula.fechaEstreno, 'dd/MM/yyyy')}"></td>
                             <td>
                                 <span th:if="${pelicula.genero != null}" th:text="${pelicula.genero.nombre}"
@@ -64,10 +79,16 @@
                                 </span>
                             </td>
                             <td>
+                                <span
+                                    th:if="${pelicula.protagonistas != null && !#lists.isEmpty(pelicula.protagonistas)}">
+                                </span>
                                 <a th:href="@{/peliculas/edit/{id}(id=${pelicula.id})}"
                                     class="btn btn-warning btn-sm me-1">
                                     Editar
                                 </a>
+                                <span
+                                    th:if="${pelicula.protagonistas == null || #lists.isEmpty(pelicula.protagonistas)}">
+                                </span>
                                 <a th:href="@{/peliculas/delete/{id}(id=${pelicula.id})}" class="btn btn-danger btn-sm"
                                     onclick="return confirm('¿Está seguro de que desea eliminar esta película?')">
                                     Eliminar
