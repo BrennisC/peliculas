@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{layout/header.html}"></head>
+    <link rel="stylesheet" th:href="@{/css/peliculas.css}" />
+
+    <body class="bg-light">
+        <!-- Navbar -->
+
+        <div class="container my-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">Catálogo de Actores</h1>
+
+                <!-- Botón para agregar nuevo actor -->
+                <a
+                    th:href="@{/actores/nuevo}"
+                    class="btn btn-success btn-sm d-flex align-items-center"
+                >
+                    <i class="bi bi-person-plus me-2"></i> Agregar Actor
+                </a>
+            </div>
+
+            <div class="list-group shadow-sm">
+                <div
+                    th:each="actor : ${actores}"
+                    class="list-group-item list-group-item-action d-flex align-items-center justify-content-between"
+                >
+                    <div class="d-flex align-items-center">
+                        <img
+                            th:src="@{${actor.urlImagen}}"
+                            th:alt="${actor.nombre}"
+                            class="actor-avatar me-3 rounded-circle border"
+                            onerror="handleImageError(this)"
+                            style="width: 60px; height: 60px; object-fit: cover"
+                        />
+                        <span
+                            th:text="${actor.nombre}"
+                            class="fs-5 fw-semibold text-dark"
+                        ></span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <!-- Botón Editar -->
+                        <a
+                            th:href="@{/actores/editar/{id}(id=${actor.id})}"
+                            class="btn btn-warning btn-sm mx-2"
+                            aria-label="Editar actor"
+                        >
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+
+                        <!-- Botón Eliminar -->
+                        <form
+                            th:action="@{/actores/eliminar/{id}(id=${actor.id})}"
+                            method="post"
+                            style="display: inline"
+                            aria-label="Eliminar actor"
+                        >
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap Icons (si aún no lo tienes en tu header.html) -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        />
+    </body>
+</html>

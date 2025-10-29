@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{layout/header.html}"></head>
+    <link rel="stylesheet" th:href="@{/css/peliculas.css}" />
+
+    <body class="bg-light">
+        <!-- Navbar -->
+        <div class="container my-4">
+            <h1 class="text-center mb-4">Agregar Nuevo Actor</h1>
+
+            <!-- Formulario para agregar actor -->
+            <form
+                th:action="@{/actores/guardar}"
+                th:object="${actor}"
+                method="post"
+            >
+                <div class="mb-3">
+                    <label for="nombre" class="form-label"
+                        >Nombre del Actor</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="nombre"
+                        th:field="*{nombre}"
+                        placeholder="Nombre del actor"
+                        required
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <label for="urlImagen" class="form-label"
+                        >URL de la Imagen</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="urlImagen"
+                        th:field="*{urlImagen}"
+                        placeholder="URL de la imagen del actor"
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-success">
+                        Guardar Actor
+                    </button>
+                    <a href="/actores" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

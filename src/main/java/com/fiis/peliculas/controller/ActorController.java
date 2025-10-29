@@ -1,79 +1,78 @@
 package com.fiis.peliculas.controller;
 
+import com.fiis.peliculas.entities.Actor;
+import com.fiis.peliculas.services.autor.IActorService;
 import java.util.List;
-
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.fiis.peliculas.entities.Actor;
-import com.fiis.peliculas.services.autor.IActorService;
-
-
-@RestController
-@RequestMapping("/api")
+@Controller
 public class ActorController {
 
-    private final IActorService actorService;
+    @Autowired
+    private IActorService actorService;
 
     public ActorController(IActorService actorService) {
         this.actorService = actorService;
     }
 
-    @PostMapping("/actor")
-    public ResponseEntity<?> createActor(@ModelAttribute Actor actor, @RequestParam(value = "file", required = false) MultipartFile file) {
-        try {
-            actorService.save(actor, file);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al guardar el actor: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/actor/{id}")
-    public ResponseEntity<Actor> getById(@PathVariable Long id) {
-        Actor actor = actorService.findById(id);
-        if (actor != null) {
-            return ResponseEntity.ok(actor);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    
-
     @GetMapping("/actores")
-    public ResponseEntity<List<Actor>> getAll() {
+    public String actores(Model model) {
         List<Actor> actores = actorService.findAll();
-        return ResponseEntity.ok(actores);
+        if (actores.isEmpty()) {
+            model.addAttribute("mensaje", "No hay actores registrados");
+        } else {
+            model.addAttribute("actores", actores);
+        }
+        // Paginación para actores
+        return "views/actores";
     }
 
-    @DeleteMapping("/actor/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @GetMapping("/actores/nuevo")
+    public String nuevoActor(Model model) {
+        model.addAttribute("actor", new Actor()); // Crear un actor vacío
+        return "views/form-actor"; // Vista del formulario
+    }
+
+    @PostMapping("/actores/guardar")
+    public String guardarActor(@ModelAttribute Actor actor) {
+        actorService.save(actor); // Guardar el actor en la base de datos
+        return "redirect:/actores"; // Redirigir al listado de actores
+    }
+
+    @DeleteMapping("/actores/eliminar/{id}")
+    public String deleteActor(
+        @PathVariable Long id,
+        RedirectAttributes redirectAttributes
+    ) {
         try {
             actorService.delete(id);
-            return ResponseEntity.noContent().build();
+            redirectAttributes.addFlashAttribute(
+                "success",
+                "Película eliminada exitosamente"
+            );
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            redirectAttributes.addFlashAttribute(
+                "error",
+                "Error al eliminar la película: " + e.getMessage()
+            );
         }
+        return "redirect:/actores";
     }
 
-    @GetMapping("/actores/pageable")
-    public ResponseEntity<List<Actor>> getAllPaginated(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        try {
-            org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-            org.springframework.data.domain.Page<Actor> actoresPage = actorService.findAll(pageable);
-            return ResponseEntity.ok(actoresPage.getContent());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PutMapping("/actores/editar/{id}")
+    public String editarActor(@PathVariable Long id, @RequestBody Actor actor) {
+        actor.setId(id);
+        actorService.save(actor);
+        return "redirect:/actores";
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fiis.peliculas.dao.IPeliculaRepository;
 import com.fiis.peliculas.entities.Actor;
@@ -28,7 +29,34 @@ public class PeliculaService implements IPeliculaService {
     private IActorService actorService;
 
     @Override
-    public Pelicula save(Pelicula pelicula, Long generoId, List<Long> actorIds) {
+    public Pelicula save(Pelicula pelicula, Long generoId, List<Long> actorIds, MultipartFile file) {
+
+        // Procesar la imagen si se proporciona
+        if(file != null && !file.isEmpty()) {
+            try {
+                // CORREGIDO: Cambiar de /actores/ a /peliculas/
+                String uploadDir = System.getProperty("user.dir") + "/uploads/peliculas/";
+                java.io.File dir = new java.io.File(uploadDir);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                
+                // Nombre único para la imagen
+                String fileName = java.util.UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+                java.nio.file.Path filePath = java.nio.file.Paths.get(uploadDir, fileName);
+                
+                // Guardar archivo
+                file.transferTo(filePath);
+                
+                // CORREGIDO: Guardar la ruta correcta
+                pelicula.setUrlImagen("/uploads/peliculas/" + fileName);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error al guardar la imagen de la película");
+            }
+        }
+        
         // Asignar género si se seleccionó uno
         if (generoId != null) {
             Genero genero = generoService.findById(generoId);
@@ -67,5 +95,29 @@ public class PeliculaService implements IPeliculaService {
     @Override
     public Page<Pelicula> findAll(Pageable pageable) {
         return peliculaRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Pelicula> findByNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return findAll();
+        }
+        return peliculaRepository.findByNombreContainingIgnoreCase(nombre.trim());
+    }
+
+    @Override
+    public Page<Pelicula> findByNombre(String nombre, Pageable pageable) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return findAll(pageable);
+        }
+        return peliculaRepository.findByNombreContainingIgnoreCase(nombre.trim(), pageable);
+    }
+
+    @Override
+    public Page<Pelicula> findByNombreOrGenero(String searchTerm, Pageable pageable) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return findAll(pageable);
+        }
+        return peliculaRepository.findByNombreOrGeneroContainingIgnoreCase(searchTerm.trim(), pageable);
     }
 }

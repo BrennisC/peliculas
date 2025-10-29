@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fiis.peliculas.entities.Actor;
@@ -60,11 +61,15 @@ public class PeliculaController {
         return actorService.findAll();
     }
 
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("peliculas", new Pelicula());
+        return "views/index";
+    }
     // Mostrar la vista de películas con la lista y formulario
     @GetMapping("/peliculas")
     public String showPeliculas(Model model){
-
-        model.addAttribute("pelicula", new Pelicula());
+      model.addAttribute("pelicula", new Pelicula());
         return "views/peliculas";
     }
 
@@ -74,7 +79,7 @@ public class PeliculaController {
                               BindingResult result,
                               @RequestParam(value = "generoId", required = false) Long generoId,
                               @RequestParam(value = "actorIds", required = false) List<Long> actorIds,
-                              RedirectAttributes redirectAttributes , Model model) {
+                              RedirectAttributes redirectAttributes , Model model,@RequestParam(value = "file", required = false) MultipartFile file) {
 
         // Si hay errores de validación, devolver la vista con los errores por campo
         if (result.hasErrors()) {
@@ -89,7 +94,7 @@ public class PeliculaController {
         }
 
         try {
-            peliculaService.save(pelicula, generoId, actorIds);
+            peliculaService.save(pelicula, generoId, actorIds,file);
             redirectAttributes.addFlashAttribute("success", "Película guardada exitosamente");
         } catch (Exception e) {
             // No exponer e.getMessage() que puede contener rutas/entidades.
@@ -100,12 +105,38 @@ public class PeliculaController {
 
     // Editar película
     @GetMapping("/peliculas/edit/{id}")
-    public String editPelicula(@PathVariable Long id, Model model) {
+    public String editPelicula(@PathVariable Long id, 
+                              Model model,
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "10") int size) {
+        
+        // Obtener la película a editar
         Pelicula pelicula = peliculaService.findById(id);
+        
+        if (pelicula == null) {
+            return "redirect:/administrar_peliculas";
+        }
+        
+        // Paginación para películas
+        Pageable pageable = PageRequest.of(page, size, Sort.by("nombre"));
+        Page<Pelicula> peliculasPage = peliculaService.findAll(pageable);
+        
+        // Agregar la película a editar
         model.addAttribute("pelicula", pelicula);
-        model.addAttribute("peliculas", peliculaService.findAll());
-        // Los generos y actores ya están disponibles por los @ModelAttribute
-        return "views/adminitrar_peliculas";
+        
+        // Agregar datos de paginación
+        model.addAttribute("peliculasPage", peliculasPage);
+        model.addAttribute("peliculas", peliculasPage.getContent());
+        
+        // Atributos para la paginación
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalPages", peliculasPage.getTotalPages());
+        model.addAttribute("totalElements", peliculasPage.getTotalElements());
+        model.addAttribute("hasPrevious", peliculasPage.hasPrevious());
+        model.addAttribute("hasNext", peliculasPage.hasNext());
+
+        return "views/peliculas";
     }
 
     // Eliminar película
@@ -124,11 +155,20 @@ public class PeliculaController {
     @GetMapping("/administrar_peliculas")
     public String administrarPeliculas(Model model,
                                      @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size) {
+                                     @RequestParam(defaultValue = "10") int size,
+                                     @RequestParam(value = "search", required = false) String searchTerm) {
         
         // Paginación para películas en la administración
         Pageable pageable = PageRequest.of(page, size, Sort.by("nombre"));
-        Page<Pelicula> peliculasPage = peliculaService.findAll(pageable);
+        Page<Pelicula> peliculasPage;
+        
+        // Si hay término de búsqueda, buscar por nombre o género
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            peliculasPage = peliculaService.findByNombreOrGenero(searchTerm, pageable);
+            model.addAttribute("searchTerm", searchTerm);
+        } else {
+            peliculasPage = peliculaService.findAll(pageable);
+        }
         
         model.addAttribute("peliculasPage", peliculasPage);
         model.addAttribute("peliculas", peliculasPage.getContent());
@@ -142,6 +182,6 @@ public class PeliculaController {
         model.addAttribute("hasPrevious", peliculasPage.hasPrevious());
         model.addAttribute("hasNext", peliculasPage.hasNext());
         
-        return "views/adminitrar_peliculas";
+        return "views/administrar_peliculas";
     }
 }

@@ -35,6 +35,9 @@ public class Pelicula  implements  Serializable{
     @NotNull(message = "La fecha de estreno no puede estar vacia")
     private Date fechaEstreno;
 
+    @Column(name="url_imagen")
+    private String urlImagen;
+
     @ManyToOne
     @NotNull(message = "El genero no puede estar vacio")
     private Genero genero;
@@ -79,6 +82,14 @@ public class Pelicula  implements  Serializable{
     
     public void setProtagonistas(List<Actor> protagonistas) {
         this.protagonistas = protagonistas;
+    }
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 }
 

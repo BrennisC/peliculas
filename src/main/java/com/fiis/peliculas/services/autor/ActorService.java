@@ -2,11 +2,9 @@ package com.fiis.peliculas.services.autor;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fiis.peliculas.dao.IActorRepository;
 import com.fiis.peliculas.entities.Actor;
@@ -14,7 +12,6 @@ import com.fiis.peliculas.entities.Actor;
 @Service
 public class ActorService  implements  IActorService {
 
-    @Autowired
     private final IActorRepository actorRepository;
 
     public ActorService(IActorRepository actorRepository) {
@@ -22,29 +19,7 @@ public class ActorService  implements  IActorService {
     }
 
     @Override
-    public void save(Actor actor , MultipartFile file) {
-        if(file != null && !file.isEmpty()) {
-            try {
-
-                String uploadDir = System.getProperty("user.dir") + "/uploads/actores/";
-                java.io.File dir = new java.io.File(uploadDir);
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                // Nombre único para la imagen
-                String fileName = java.util.UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                java.nio.file.Path filePath = java.nio.file.Paths.get(uploadDir, fileName);
-                // Guardar archivo
-                file.transferTo(filePath);
-                // Guardar la ruta relativa o absoluta en el actor
-                actor.setUrlImagen("/uploads/actores/" + fileName);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // Manejo de errores (puedes lanzar una excepción personalizada si lo deseas)
-                throw new RuntimeException("Error al guardar la imagen del actor");
-            }
-        }
-
+    public void save(Actor actor ) {
         actorRepository.save(actor);
     }
 
@@ -66,6 +41,22 @@ public class ActorService  implements  IActorService {
     @Override
     public Page<Actor> findAll(Pageable pageable) {
         return actorRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Actor> findByNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return findAll();
+        }
+        return actorRepository.findByNombreContainingIgnoreCase(nombre.trim());
+    }
+
+    @Override
+    public Page<Actor> findByNombre(String nombre, Pageable pageable) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return findAll(pageable);
+        }
+        return actorRepository.findByNombreContainingIgnoreCase(nombre.trim(), pageable);
     }
 
 }
