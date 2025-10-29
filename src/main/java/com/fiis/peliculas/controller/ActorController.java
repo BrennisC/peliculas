@@ -37,19 +37,13 @@ public class ActorController {
         return "views/actores";
     }
 
-    @GetMapping("/actores/nuevo")
-    public String nuevoActor(Model model) {
-        model.addAttribute("actor", new Actor()); // Crear un actor vacío
-        return "views/form-actor"; // Vista del formulario
-    }
-
     @PostMapping("/actores/guardar")
     public String guardarActor(@ModelAttribute Actor actor) {
         actorService.save(actor); // Guardar el actor en la base de datos
         return "redirect:/actores"; // Redirigir al listado de actores
     }
 
-    @DeleteMapping("/actores/eliminar/{id}")
+    @PostMapping("/actores/eliminar/{id}")
     public String deleteActor(
         @PathVariable Long id,
         RedirectAttributes redirectAttributes
@@ -69,10 +63,10 @@ public class ActorController {
         return "redirect:/actores";
     }
 
-    @PutMapping("/actores/editar/{id}")
-    public String editarActor(@PathVariable Long id, @RequestBody Actor actor) {
-        actor.setId(id);
-        actorService.save(actor);
-        return "redirect:/actores";
+    @GetMapping("/actores/editar/{id}")
+    public String editarActor(@PathVariable Long id, Model model) {
+        Actor actor = actorService.findById(id); // Asume que tienes un findById
+        model.addAttribute("actor", actor);
+        return "views/form-actor"; // Reutiliza la vista del formulario
     }
 }
